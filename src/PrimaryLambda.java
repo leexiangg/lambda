@@ -1,4 +1,3 @@
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.function.*;
 
@@ -18,10 +17,10 @@ public class PrimaryLambda {
             public void run() {
                 System.out.println("匿名内部类示例：非lambda形式");
             }
-        }).run();
+        }).start();
 
         // lambda形式
-        new Thread(() -> System.out.println("匿名内部类示例：lambda形式")).run();
+        new Thread(() -> System.out.println("匿名内部类示例：lambda形式")).start();
     }
 
     /**
@@ -89,20 +88,19 @@ public class PrimaryLambda {
 
         // for先遍历key，通过key获取value
         System.out.println("Map遍历：for先遍历key，通过key获取value");
-        Object[] keyArr = map.keySet().toArray();
-        for (int i = 0; i < keyArr.length; i++) {
-            System.out.println(keyArr[i] + " : " + map.get(keyArr[i]));
+        for (Object o : map.keySet().toArray()) {
+            System.out.println(o + " : " + map.get(o));
         }
+
+        // lambda遍历key，通过key获取value
+        System.out.println("Map遍历：lambda遍历key，通过key获取value");
+        map.keySet().forEach(key -> System.out.println(key + " : " + map.get(key)));
 
         // foreach的方式
         System.out.println("Map遍历：foreach的方式");
         for(Map.Entry<String, String> entity : map.entrySet()) {
             System.out.println(entity.getKey() + " : " + entity.getValue());
         }
-
-        // lambda遍历key，通过key获取value
-        System.out.println("Map遍历：lambda遍历key，通过key获取value");
-        map.keySet().forEach(key -> System.out.println(key + " : " + map.get(key)));
 
         // lambda的方式
         System.out.println("Map遍历：lambda的方式");
@@ -115,26 +113,69 @@ public class PrimaryLambda {
      */
     public static void functionDemo() {
         // Function 接收一个参数，返回一个参数
-        Function f = t -> t + "Function";
+        Function<String, String> f = t -> t + "Function";
         System.out.println(f.apply("函数式接口："));
 
         // Predicate 接收一个参数，返回boolean
         System.out.println("函数式接口：Predicate");
-        Predicate p = t -> t == null;
+        Predicate<String> p = Objects::isNull;
         System.out.println(p.test(""));
 
         // Supplier 不接收参数，返回一个参数
-        Supplier s = () -> "函数式接口：Supplier";
+        Supplier<String> s = () -> "函数式接口：Supplier";
         System.out.println(s.get());
 
         // Consumer 接收一个参数，不返回
-        Consumer c = t -> System.out.println(t);
+        Consumer<String> c = System.out::println;
         c.accept("函数式接口：Consumer");
 
         // BiFunction 接收两个参数，返回一个参数
         System.out.println("函数式接口：BiFunction");
-        BiFunction b = (t, u) -> t == u;
-        System.out.println(b.apply("2", new String("2")));
+        BiFunction<Object, Object, Boolean> b = Objects::equals;
+        System.out.println(b.apply("2", 2));
+
+        // 还有比较常见的 Runnable、Comparator等
+    }
+
+    /**
+     * Stream工具
+     */
+    public static void toolDemo() {
+        Collection<String> list = Arrays.asList("1", "3", "2", "4", "2");
+
+        // filter过滤
+        System.out.println("Stream工具：filter");
+        list.stream().filter(t -> !t.equals("2")).forEach(System.out::println);
+
+        // map转换元素值
+        System.out.println("Stream工具：map");
+        list.stream().map(t -> t + "8").forEach(System.out::println);
+
+        // limit保留前n个元素
+        System.out.println("Stream工具：limit");
+        list.stream().limit(2).forEach(System.out::println);
+
+        // skip跳过前n个元素
+        System.out.println("Stream工具：skip");
+        list.stream().skip(2).forEach(System.out::println);
+
+        // distinct剔除重复元素
+        System.out.println("Stream工具：distinct");
+        list.stream().distinct().forEach(System.out::println);
+
+        // sorted默认排序
+        System.out.println("Stream工具：sorted");
+        list.stream().sorted().forEach(System.out::println);
+
+        // sorted倒序
+        System.out.println("Stream工具：sorted desc");
+        list.stream().sorted(Comparator.reverseOrder()).forEach(System.out::println);
+
+        // reduce计算
+        System.out.println("Stream工具：reduce");
+        String result = list.stream().reduce((t, s) -> String.valueOf(Integer.sum(Integer.parseInt(t), Integer.parseInt(s)))).get();
+        System.out.println(result);
+
     }
 
     public static void main(String[] args) {
@@ -147,6 +188,8 @@ public class PrimaryLambda {
         mapDemo();
         System.out.println();
         functionDemo();
+        System.out.println();
+        toolDemo();
     }
 
 }
